@@ -1,9 +1,6 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-import wget
-
+import mne
+import pandas as pd
+import preporocessing
 # Press the green button in the gutter to run the script.
 
 if __name__ == '__main__':
@@ -12,6 +9,11 @@ if __name__ == '__main__':
     https://physionet.org/content/sleep-edfx/1.0.0/sleep-cassette/SC4001E0-PSG.edf
     https://physionet.org/content/sleep-edfx/1.0.0/sleep-cassette/SC4001EC-Hypnogram.edf
     '''
-    # filename = wget.download("https://physionet.org/content/sleep-edfx/1.0.0/sleep-cassette/SC4001E0-PSG.edf")
-    print(filename)
+    patient = 'SC4001E0-PSG.edf'
+    annotation = 'SC4001EC-Hypnogram.edf'
+    raw = mne.io.read_raw_edf(patient, preload=True)
+    annot = mne.read_annotations(annotation)
+    sleep_stages = preporocessing.preprocessing(annot, 60)
+    eeg_signals = preporocessing.table_with_signals(sleep_stages, raw)
+
 
