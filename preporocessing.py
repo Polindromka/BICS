@@ -10,15 +10,14 @@ def preprocessing(annotation, duration=60):
     """
     sleep_stages = pd.DataFrame(columns=['onset', 'duration', 'stage'])
     for x in annotation:
-        sleep_stages = sleep_stages.append(
-            {'onset': x['onset'], 'duration': x['duration'], 'stage': x['description'][-1:]}, ignore_index=True)
+        additional_data = pd.DataFrame({'onset': x['onset'], 'duration': x['duration'], 'stage': x['description'][-1:]}, index=[0])
+        sleep_stages = pd.concat([sleep_stages, additional_data])
     sleep_stages = sleep_stages.loc[sleep_stages['stage'].isin(['1', '2', '3', '4', 'W', 'R'])]
     for index, sleep in sleep_stages.iterrows():
         if sleep['duration'] > 60.0:
             for i in range(int(sleep['duration'] // duration)):
-                sleep_stages = sleep_stages.append(
-                    {'onset': sleep['onset'] + i * duration, 'duration': duration, 'stage': sleep['stage']},
-                    ignore_index=True)
+                additional_data = pd.DataFrame({'onset': sleep['onset'] + i * duration, 'duration': duration, 'stage': sleep['stage']}, index=[0])
+                sleep_stages = pd.concat([sleep_stages, additional_data])
     sleep_stages = sleep_stages.loc[sleep_stages['duration'] == 60]
     return sleep_stages
 
@@ -42,4 +41,7 @@ def table_with_signals(sleep_stages, raw):
         eeg_signals.append(d)
 
     eeg_signals = pd.DataFrame(eeg_signals)
+    eeg_signals.loc[eeg_signals['stage'] == 'W', 'stage'] = 0
+    eeg_signals.loc[eeg_signals['stage'] == 'R', 'stage'] = -1
+    eeg_signals['stage'] = eeg_signals['stage'].astype(int)
     return eeg_signals

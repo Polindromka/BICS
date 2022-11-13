@@ -119,26 +119,28 @@ class Decoder(nn.Module):
         recovered = self.decoder(x)
         return recovered
 
-    class AutoEncoder(nn.Module):
-        """
-        Class Autoencoder
-        """
-        def __init__(self, latent_size):
-            """
-            Initializing autoencoder
-            :param latent_size: Number of layers
-            """
-            super().__init__()
-            self.latent_size = latent_size
-            self.encoder = Encoder(latent_size)
-            self.decoder = Decoder(latent_size)
 
-        def forward(self, x):
-            """
-            Go through autoencoder
-            :param x: Input signal
-            :return: Recovered signal and embeddings (main features)
-            """
-            embedding = self.encoder(x)
-            recovered_x = self.decoder(embedding)
-            return recovered_x, embedding
+class AutoEncoder(nn.Module):
+    """
+    Class Autoencoder
+    """
+
+    def __init__(self, latent_size):
+        """
+        Initializing autoencoder
+        :param latent_size: Number of layers
+        """
+        super().__init__()
+        self.latent_size = latent_size
+        self.encoder = Encoder(latent_size)
+        self.decoder = Decoder(latent_size)
+
+    def forward(self, x):
+        """
+        Go through autoencoder
+        :param x: Input signal
+        :return: Recovered signal and embeddings (main features)
+        """
+        embedding = self.encoder(x)
+        recovered_x = self.decoder(embedding)
+        return recovered_x, embedding
