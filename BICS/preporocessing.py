@@ -9,11 +9,20 @@ def preprocessing(annotation, duration=60):
     :return: table with signals in same duration
     """
     sleep_stages = pd.DataFrame(columns=['onset', 'duration', 'stage'])
+    """
+    Take each annotation line and create DataFrame from it
+    """
     for x in annotation:
         additional_data = pd.DataFrame({'onset': x['onset'], 'duration': x['duration'], 'stage': x['description'][-1:]}, index=[0])
         sleep_stages = pd.concat([sleep_stages, additional_data])
     sleep_stages = sleep_stages.loc[sleep_stages['stage'].isin(['1', '2', '3', '4', 'W', 'R'])]
+    """
+    Check each signal duration
+    """
     for index, sleep in sleep_stages.iterrows():
+        """
+        If duration >60.0 then slice itL
+        """
         if sleep['duration'] > 60.0:
             for i in range(int(sleep['duration'] // duration)):
                 additional_data = pd.DataFrame({'onset': sleep['onset'] + i * duration, 'duration': duration, 'stage': sleep['stage']}, index=[0])
@@ -42,6 +51,6 @@ def table_with_signals(sleep_stages, raw):
 
     eeg_signals = pd.DataFrame(eeg_signals)
     eeg_signals.loc[eeg_signals['stage'] == 'W', 'stage'] = 0
-    eeg_signals.loc[eeg_signals['stage'] == 'R', 'stage'] = -1
+    eeg_signals.loc[eeg_signals['stage'] == 'R', 'stage'] = 5
     eeg_signals['stage'] = eeg_signals['stage'].astype(int)
     return eeg_signals

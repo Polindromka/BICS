@@ -13,10 +13,16 @@ def train(model, train_dataloader, epoch=15):
     :return: trained model
     """
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    optimizer = optim.Adam(model.parameters(), lr=1e-5, weight_decay=1e-4)
+    optimizer = optim.RMSprop(model.parameters(), lr=1e-5, weight_decay=1e-4)
     model.to(device)
     model.train()
+    """
+    Go through epochs 
+    """
     for epoch in range(epoch):
+        """
+        Get each butch and compete loss for it
+        """
         for img_batch, labels in train_dataloader:
             optimizer.zero_grad()
             output, latent = model(img_batch.to(device))
